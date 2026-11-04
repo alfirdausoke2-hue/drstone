@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr. STONE: Science Kingdom Revival</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Teko:wght@500;700&display=swap');
+        
+        body {
+            font-family: 'Share Tech Mono', monospace;
+            background-color: #07090e;
+            color: #c9d1d9;
+            user-select: none;
+        }
+        
+        .font-tech {
+            font-family: 'Teko', sans-serif;
+        }
+
+        .custom-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #161b22;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #238636;
+            border-radius: 3px;
+        }
+
+        .stone-card {
+            background: linear-gradient(145deg, #121721, #0a0d14);
+            border: 1px solid #1f2937;
+        }
+
+        .science-glow {
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 8px rgba(56, 189, 248, 0.4); }
+            50% { box-shadow: 0 0 25px rgba(56, 189, 248, 0.8); }
+        }
+
+        .glow-active {
+            animation: pulse-glow 2s infinite;
+        }
+
+        /* ANIME-STYLE REACTION GRAPHICS & FX */
+        @keyframes bubble-rise {
+            0% { transform: translateY(20px) scale(0.6); opacity: 0; }
+            50% { opacity: 0.9; }
+            100% { transform: translateY(-60px) scale(1.4); opacity: 0; }
+        }
+        .bubble-particle {
+            position: absolute;
+            border-radius: 50%;
+            animation: bubble-rise 1.2s ease-out infinite;
+        }
+
+        @keyframes chemical-glow {
+            0% { filter: drop-shadow(0 0 5px #10b981) hue-rotate(0deg); }
+            50% { filter: drop-shadow(0 0 25px #06b6d4) hue-rotate(180deg); }
+            100% { filter: drop-shadow(0 0 5px #10b981) hue-rotate(360deg); }
+        }
+        .anime-vial-glow {
+            animation: chemical-glow 3s infinite linear;
+        }
+
+        @keyframes lightning-flash {
+            0%, 100% { opacity: 0; transform: scale(0.8) rotate(0deg); }
+            10%, 90% { opacity: 1; transform: scale(1.2) rotate(15deg); }
+            50% { opacity: 0.3; transform: scale(1) rotate(-10deg); }
+        }
+        .spark-lightning {
+            animation: lightning-flash 0.5s ease-in-out infinite;
+        }
+
+        /* AUDIO VISUALIZER BAR ANIMATION */
+        @keyframes sound-wave {
+            0%, 100% { height: 4px; }
+            50% { height: 24px; }
+        }
+        .audio-bar {
+            width: 4px;
+            background: #10b981;
+            border-radius: 2px;
+        }
+        .audio-active .audio-bar:nth-child(1) { animation: sound-wave 0.4s infinite ease-in-out; }
+        .audio-active .audio-bar:nth-child(2) { animation: sound-wave 0.6s infinite ease-in-out 0.1s; }
+        .audio-active .audio-bar:nth-child(3) { animation: sound-wave 0.3s infinite ease-in-out 0.2s; }
+        .audio-active .audio-bar:nth-child(4) { animation: sound-wave 0.5s infinite ease-in-out 0.15s; }
+        .audio-active .audio-bar:nth-child(5) { animation: sound-wave 0.45s infinite ease-in-out 0.05s; }
+    </style>
+</head>
+<body class="h-screen w-screen overflow-hidden flex flex-col">
+
+    <!-- TOP NAV / HEADER -->
+    <header class="bg-gray-950 border-b border-gray-800 px-6 py-3 flex justify-between items-center z-10">
+        <div class="flex items-center gap-3">
+            <div class="bg-gradient-to-br from-emerald-500 to-cyan-500 text-black font-bold p-1.5 rounded-lg text-xl flex items-center justify-center w-10 h-10 shadow-lg shadow-emerald-950">
+                🧪
+            </div>
+            <div>
+                <h1 class="text-2xl font-bold tracking-wider text-emerald-400 font-tech uppercase leading-none flex items-center gap-2">
+                    Dr. STONE <span class="text-xs bg-emerald-950 border border-emerald-700 text-emerald-400 px-2 py-0.5 rounded font-sans">SCIENCE LAB</span>
+                </h1>
+                <p class="text-xs text-gray-400 tracking-widest">SCIENCE KINGDOM REVIVAL</p>
+            </div>
+        </div>
+
+        <!-- AUDIO VISUALIZER DISPLAY IN HEADER -->
+        <div class="hidden sm:flex items-center gap-3 bg-gray-900 border border-gray-800 px-4 py-1.5 rounded-full" id="audio-visualizer-box">
+            <div class="text-[10px] text-emerald-400 uppercase tracking-widest font-bold">AUDIO FREQ</div>
+            <div class="flex items-center gap-1 h-6" id="audio-bars">
+                <div class="audio-bar"></div>
+                <div class="audio-bar"></div>
+                <div class="audio-bar"></div>
+                <div class="audio-bar"></div>
+                <div class="audio-bar"></div>
+            </div>
+        </div>
+
+        <!-- STATS BAR -->
+        <div class="flex gap-4 text-sm">
+            <div class="bg-gray-900 border border-gray-800 px-3 py-1 rounded-lg flex items-center gap-2">
+                <i class="fa-solid fa-star text-yellow-400"></i>
+                <span>Bintang: <strong id="total-stars" class="text-yellow-400">0</strong>/15</span>
+            </div>
+            <div class="bg-gray-900 border border-gray-800 px-3 py-1 rounded-lg flex items-center gap-2">
+                <i class="fa-solid fa-flask text-emerald-400"></i>
+                <span>Level Sains: <strong id="science-lvl" class="text-emerald-400">Lv.1</strong></span>
+            </div>
+        </div>
+
+        <button onclick="toggleModal('enc-modal')" class="bg-gray-900 hover:bg-gray-800 text-emerald-400 border border-emerald-500/30 px-4 py-2 rounded-lg text-sm flex items-center gap-2 transition">
+            <i class="fa-solid fa-book-journal-whills"></i> Encyclopedia
+        </button>
+    </header>
+
+    <!-- MAIN GAME WORKSPACE -->
+    <main class="flex-1 flex overflow-hidden">
+        
+        <!-- SIDEBAR: STAGE SELECTION -->
+        <aside class="w-80 bg-gray-950 border-r border-gray-800 flex flex-col p-4 custom-scroll overflow-y-auto">
+            <h2 class="text-lg font-bold text-gray-300 mb-3 flex items-center gap-2 border-b border-gray-800 pb-2 font-tech tracking-wider">
+                <i class="fa-solid fa-map text-emerald-400"></i> STAGE & ALUR MISI SAINS
+            </h2>
+            
+            <div class="space-y-3" id="stage-list">
+                <!-- Stages populated dynamically -->
+            </div>
+        </aside>
+
+        <!-- CENTER: STAGE AREA & CRAFTING LAB / BATTLE -->
+        <section class="flex-1 flex flex-col bg-[#05070a] p-6 relative overflow-y-auto custom-scroll">
+            
+            <!-- STAGE HEADER -->
+            <div id="stage-header" class="stone-card p-4 rounded-xl mb-6 border-emerald-500/30 flex justify-between items-center relative overflow-hidden">
+                <div class="absolute -right-10 -bottom-10 text-8xl text-emerald-500/5 pointer-events-none font-bold">🧪</div>
+                <div>
+                    <span id="stage-code" class="text-xs bg-emerald-950 text-emerald-400 border border-emerald-800 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">STAGE 1-1</span>
+                    <h2 id="stage-title" class="text-2xl font-bold text-white mt-1">Awaken in the Wilderness</h2>
+                    <p id="stage-desc" class="text-sm text-gray-400">Kumpulkan serat kayu dan batu api untuk membuat api pertama peradaban baru.</p>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button id="btn-story" onclick="showStoryModal()" class="bg-amber-500 hover:bg-amber-400 text-black font-bold px-3 py-2 rounded-lg text-xs flex items-center gap-1.5 transition shadow-lg shadow-amber-950">
+                        <i class="fa-solid fa-scroll"></i> Catatan Cerita
+                    </button>
+                    <div class="flex gap-2 bg-gray-950 px-3 py-1.5 rounded-lg border border-gray-800" id="stage-stars">
+                        <i class="fa-solid fa-star text-gray-600 text-lg" id="star-1"></i>
+                        <i class="fa-solid fa-star text-gray-600 text-lg" id="star-2"></i>
+                        <i class="fa-solid fa-star text-gray-600 text-lg" id="star-3"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BATTLE SYSTEM DISPLAY -->
+            <div id="battle-view" class="hidden stone-card rounded-xl p-6 flex flex-col flex-1 mb-6 border-red-500/40 relative overflow-hidden">
+                <div class="flex justify-between items-center border-b border-gray-800 pb-3 mb-4">
+                    <h3 class="text-lg font-bold text-red-400 flex items-center gap-2">
+                        <i class="fa-solid fa-swords"></i> ARENA PERTARUNGAN TAKTIS SAINS
+                    </h3>
+                    <span id="battle-status" class="text-xs bg-red-950 text-red-300 border border-red-800 px-2 py-1 rounded font-bold">MODE TEMPUR</span>
+                </div>
+
+                <div class="grid grid-cols-2 gap-8 my-auto">
+                    <!-- PLAYER TEAM -->
+                    <div class="bg-gray-950 border border-emerald-500/40 p-4 rounded-xl space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-emerald-400 text-lg flex items-center gap-2">
+                                🧪 KERAJAAN SAINS
+                            </span>
+                            <span id="player-hp-text" class="text-xs font-bold text-emerald-400">100 / 100 HP</span>
+                        </div>
+                        <div class="w-full bg-gray-900 rounded-full h-3 border border-gray-800 overflow-hidden">
+                            <div id="player-hp-bar" class="bg-emerald-500 h-full transition-all duration-300" style="width: 100%"></div>
+                        </div>
+                    </div>
+
+                    <!-- ENEMY TEAM -->
+                    <div class="bg-gray-950 border border-red-500/40 p-4 rounded-xl space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span id="enemy-name" class="font-bold text-red-400 text-lg flex items-center gap-2">
+                                🦁 Singa Liar Era Batu
+                            </span>
+                            <span id="enemy-hp-text" class="text-xs font-bold text-red-400">150 / 150 HP</span>
+                        </div>
+                        <div class="w-full bg-gray-900 rounded-full h-3 border border-gray-800 overflow-hidden">
+                            <div id="enemy-hp-bar" class="bg-red-500 h-full transition-all duration-300" style="width: 100%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 bg-gray-950 p-4 rounded-lg border border-gray-800 flex flex-col gap-3">
+                    <div id="battle-log" class="text-xs text-gray-300 h-16 overflow-y-auto custom-scroll space-y-1 bg-gray-900/50 p-2 rounded border border-gray-800">
+                        <p class="text-amber-400">⚡ Pertarungan dimulai! Gunakan aksi taktis atau racik penemuan sains di Lab.</p>
+                    </div>
+                    <div class="flex gap-3">
+                        <button onclick="executeBattleAction('attack_science')" class="flex-1 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-black font-bold py-2.5 rounded-lg text-xs transition shadow flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-flask-vial"></i> Serangan Ledakan Sains
+                        </button>
+                        <button onclick="executeBattleAction('defend_taiju')" class="flex-1 bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 text-black font-bold py-2.5 rounded-lg text-xs transition shadow flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-shield-halved"></i> Pertahanan Perisai Logam
+                        </button>
+                        <button onclick="executeBattleAction('scout_kohaku')" class="flex-1 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-black font-bold py-2.5 rounded-lg text-xs transition shadow flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-bolt"></i> Serangan Cepat Kilat
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CRAFTING & EXPLORATION WORKSPACE -->
+            <div id="exploration-workspace" class="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1">
+                
+                <!-- GATHERING / EXPLORATION PANEL -->
+                <div class="stone-card rounded-xl p-5 flex flex-col">
+                    <h3 class="text-md font-bold text-emerald-400 mb-3 flex items-center gap-2 border-b border-gray-800 pb-2 font-tech text-xl">
+                        <i class="fa-solid fa-tree"></i> EKSPLORASI & PENGUMPULAN MATERIAL ALAM
+                    </h3>
+                    
+                    <p class="text-xs text-gray-400 mb-4">Klik sumber daya alam untuk mengumpulkan elemen dasar ke inventaris sains.</p>
+
+                    <div id="gathering-nodes" class="grid grid-cols-2 gap-3 mb-4">
+                        <!-- Dynamic Nodes -->
+                    </div>
+
+                    <!-- STAGE PROGRESS / GOAL CHECKLIST -->
+                    <div class="mt-auto bg-gray-950 border border-gray-800 p-4 rounded-xl">
+                        <h4 class="text-xs font-bold text-gray-300 uppercase tracking-wider mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-list-check text-emerald-400"></i> Target Misi Sains
+                        </h4>
+                        <div id="stage-tasks" class="space-y-2 text-sm">
+                            <!-- Tasks here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CRAFTING / LAB PANEL WITH ADVANCED ANIME FX -->
+                <div class="stone-card rounded-xl p-5 flex flex-col">
+                    <h3 class="text-md font-bold text-cyan-400 mb-3 flex items-center gap-2 border-b border-gray-800 pb-2 font-tech text-xl">
+                        <i class="fa-solid fa-vial"></i> REAKTOR EKSPERIMEN LABORATORIUM
+                    </h3>
+
+                    <p class="text-xs text-gray-400 mb-3">Pilih 2 bahan mentah dari inventaris untuk direaksikan:</p>
+
+                    <!-- CRAFTING SLOTS & ANIMATED REACTION VESSEL -->
+                    <div class="relative flex flex-col items-center bg-gray-950 p-5 rounded-xl border border-cyan-500/30 my-2 shadow-inner overflow-hidden">
+                        
+                        <!-- ANIME LABORATORY FX OVERLAY CONTAINER -->
+                        <div id="science-fx-overlay" class="absolute inset-0 bg-black/90 rounded-xl z-20 hidden flex flex-col items-center justify-center p-4 backdrop-blur-sm">
+                            <div class="relative w-32 h-32 flex items-center justify-center">
+                                <div class="absolute inset-0 border-4 border-cyan-400/40 border-t-cyan-400 rounded-full animate-spin"></div>
+                                <div class="absolute inset-2 border-2 border-emerald-400/30 border-b-emerald-400 rounded-full animate-spin" style="animation-direction: reverse; animation-duration: 1.5s;"></div>
+                                
+                                <!-- ANIME LAB FLASK SVG ANIMATION -->
+                                <svg class="w-16 h-16 anime-vial-glow" viewBox="0 0 100 100">
+                                    <path d="M40,20 L60,20 L60,35 L75,70 A15,15 0 0,1 60,85 L40,85 A15,15 0 0,1 25,70 L40,35 Z" stroke="#38bdf8" stroke-width="4" fill="#064e3b" opacity="0.8"/>
+                                    <path d="M30,65 L70,65 A10,10 0 0,1 60,80 L40,80 A10,10 0 0,1 30,65 Z" fill="#34d399"/>
+                                </svg>
+                                
+                                <!-- BUBBLE PARTICLES -->
+                                <div class="bubble-particle bg-cyan-400 w-3 h-3 left-8 bottom-6"></div>
+                                <div class="bubble-particle bg-emerald-300 w-2 h-2 right-8 bottom-8" style="animation-delay: 0.3s"></div>
+                                <div class="bubble-particle bg-yellow-300 w-4 h-4 left-14 bottom-4" style="animation-delay: 0.6s"></div>
+                                
+                                <!-- SPARK LIGHTNING -->
+                                <div class="absolute inset-0 flex items-center justify-center spark-lightning text-yellow-300 text-3xl font-bold">⚡</div>
+                            </div>
+                            <span id="fx-text" class="text-emerald-400 font-tech text-2xl font-bold tracking-widest mt-2 animate-pulse">MEMICU REAKSI KIMIA...</span>
+                            <span class="text-[11px] text-cyan-300 italic">"10 Milyar Persen Terbukti Secara Sains!"</span>
+                        </div>
+
+                        <!-- SLOTS INTERFACE -->
+                        <div class="flex items-center justify-center gap-4 w-full">
+                            <div id="slot-1" onclick="clearSlot(1)" class="w-20 h-20 border-2 border-dashed border-gray-700 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-cyan-500 transition bg-gray-900/80 shadow-md">
+                                <span class="text-xs text-gray-500 font-bold">Bahan 1</span>
+                            </div>
+                            <span class="text-2xl text-cyan-400 font-bold">+</span>
+                            <div id="slot-2" onclick="clearSlot(2)" class="w-20 h-20 border-2 border-dashed border-gray-700 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-cyan-500 transition bg-gray-900/80 shadow-md">
+                                <span class="text-xs text-gray-500 font-bold">Bahan 2</span>
+                            </div>
+                            <span class="text-2xl text-cyan-400 font-bold">=</span>
+                            <button onclick="combineIngredients()" class="bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-black font-bold px-5 py-3.5 rounded-xl text-sm transition shadow-lg shadow-emerald-950 active:scale-95 flex items-center gap-2">
+                                <i class="fa-solid fa-atom text-base"></i> REAKSI!
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- REACTION RESULT ALERT -->
+                    <div id="lab-result" class="hidden p-3 rounded-lg text-xs text-center font-bold mb-4 shadow"></div>
+
+                    <!-- INVENTORY LIST -->
+                    <div class="flex-1 flex flex-col min-h-[180px]">
+                        <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 flex justify-between items-center">
+                            <span>Inventaris Bahan Saat Ini</span>
+                            <span class="text-[10px] text-gray-500">Klik bahan untuk dimasukkan ke slot lab</span>
+                        </h4>
+                        <div id="inventory-grid" class="grid grid-cols-4 gap-2 overflow-y-auto max-h-48 custom-scroll p-1">
+                            <!-- Items here -->
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <!-- STORY MODAL DIALOGUE -->
+    <div id="story-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-gray-900 border border-amber-500/40 rounded-xl w-full max-w-xl overflow-hidden shadow-2xl flex flex-col">
+            <div class="p-4 bg-gray-950 border-b border-gray-800 flex justify-between items-center">
+                <span id="story-chapter-title" class="text-xs font-bold text-amber-400 uppercase tracking-widest flex items-center gap-2">
+                    <i class="fa-solid fa-book-open"></i> CATATAN CERITA MISI
+                </span>
+                <button onclick="toggleModal('story-modal')" class="text-gray-400 hover:text-white text-xl">&times;</button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div class="bg-gray-950 p-5 rounded-xl border border-gray-800">
+                    <h4 id="story-speaker-name" class="text-sm font-bold text-amber-400 uppercase tracking-wider mb-2">PENGANTAR SAINS</h4>
+                    <p id="story-dialogue-text" class="text-sm text-gray-200 leading-relaxed italic">
+                        "3.700 tahun berlalu sejak seluruh manusia berubah menjadi batu. Kita akan membangkitkan peradaban modern kembali dari nol dengan sains!"
+                    </p>
+                </div>
+            </div>
+            <div class="p-4 bg-gray-950 border-t border-gray-800 flex justify-end">
+                <button onclick="toggleModal('story-modal')" class="bg-amber-500 hover:bg-amber-400 text-black font-bold px-6 py-2 rounded-lg text-xs transition">
+                    MULAI MISI SAINS
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ENCYCLOPEDIA MODAL -->
+    <div id="enc-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-gray-900 border border-emerald-500/40 rounded-xl w-full max-w-2xl max-h-[80vh] flex flex-col overflow-hidden shadow-2xl">
+            <div class="p-4 bg-gray-950 border-b border-gray-800 flex justify-between items-center">
+                <h3 class="text-lg font-bold text-emerald-400 flex items-center gap-2 font-tech text-2xl">
+                    <i class="fa-solid fa-book-journal-whills"></i> SENKU'S SCIENCE ENCYCLOPEDIA
+                </h3>
+                <button onclick="toggleModal('enc-modal')" class="text-gray-400 hover:text-white text-xl">&times;</button>
+            </div>
+            <div class="p-6 overflow-y-auto custom-scroll space-y-4" id="encyclopedia-list">
+                <!-- Encyclopedia Entries -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ENHANCED WEB AUDIO SYNTHESIZER FOR SFX & AUDIO VISUALIZER TRIGGER -->
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function triggerAudioVisualizer() {
+            const viz = document.getElementById('audio-visualizer-box');
+            if (!viz) return;
+            viz.classList.add('audio-active');
+            setTimeout(() => {
+                viz.classList.remove('audio-active');
+            }, 600);
+        }
+
+        function playSFX(type) {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            
+            triggerAudioVisualizer();
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'click') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(450, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.05);
+            } else if (type === 'gather') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(280, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(560, audioCtx.currentTime + 0.12);
+                gain.gain.setValueAtTime(0.09, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.12);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.12);
+            } else if (type === 'reaction') {
+                // Chemical reaction bubbling audio synth
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                osc.frequency.linearRampToValueAtTime(800, audioCtx.currentTime + 0.5);
+                gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.5);
+            } else if (type === 'success') {
+                // Fanfare notes C5 -> E5 -> G5 -> C6
+                const now = audioCtx.currentTime;
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, now);
+                osc.frequency.setValueAtTime(659.25, now + 0.1);
+                osc.frequency.setValueAtTime(783.99, now + 0.2);
+                osc.frequency.setValueAtTime(1046.50, now + 0.3);
+                gain.gain.setValueAtTime(0.12, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+                osc.start();
+                osc.stop(now + 0.5);
+            } else if (type === 'fail' || type === 'hit') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+                osc.frequency.linearRampToValueAtTime(80, audioCtx.currentTime + 0.25);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.25);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.25);
+            }
+        }
+    </script>
+
+    <!-- GAME DATA AND LOGIC -->
+    <script>
+        // ITEMS DATABASE
+        const ITEMS = {
+            wood_fiber: { id: 'wood_fiber', name: 'Serat Kayu', icon: '🪵', desc: 'Bahan dasar alami dari pepohonan.' },
+            flint: { id: 'flint', name: 'Batu Api', icon: '🪨', desc: 'Batu keras penghasil percikan api.' },
+            fire: { id: 'fire', name: 'Api Pertama', icon: '🔥', desc: 'Sumber panas dan awal mula peradaban sains.' },
+            guano: { id: 'guano', name: 'Guano (Kotoran)', icon: '🦇', desc: 'Kaya akan kandungan asam nitrat alami.' },
+            minerals: { id: 'minerals', name: 'Air Mineral Gua', icon: '💧', desc: 'Mencairkan senyawa kompleks.' },
+            nitric_acid: { id: 'nitric_acid', name: 'Asam Nitrat Pure', icon: '🧪', desc: 'Cairan asam kuat pemecah batu ketakutan.' },
+            seashells: { id: 'seashells', name: 'Minyak Kerang', icon: '🐚', desc: 'Kaya akan kalsium karbonat dan lemak alami.' },
+            ashes: { id: 'ashes', name: 'Abu Gosok', icon: '🧹', desc: 'Sumber potasium karbonat murni.' },
+            soap: { id: 'soap', name: 'Sabun (Cleanser)', icon: '🧼', desc: 'Pembersih dan pelindung kesehatan koloni.' },
+            sulfur: { id: 'sulfur', name: 'Belerang Sulfur', icon: '🟡', desc: 'Kristal kuning dari gunung vulkanik.' },
+            charcoal: { id: 'charcoal', name: 'Arang Kayu', icon: '⬛', desc: 'Karbon hasil pembakaran tak sempurna.' },
+            gunpowder: { id: 'gunpowder', name: 'Bubuk Mesiu Black Powder', icon: '💥', desc: 'Senjata puncak sains untuk mengimbangi Tsukasa.' },
+            iron_ore: { id: 'iron_ore', name: 'Bijih Besi Pasir', icon: '🧲', desc: 'Endapan besi alami di sungai.' },
+            furnace: { id: 'furnace', name: 'Besi Cetak (Steel)', icon: '⚔️', desc: 'Peralatan tempur logam keras.' }
+        };
+
+        // RECIPES DATABASE
+        const RECIPES = [
+            { ingredients: ['wood_fiber', 'flint'], result: 'fire' },
+            { ingredients: ['guano', 'minerals'], result: 'nitric_acid' },
+            { ingredients: ['seashells', 'ashes'], result: 'soap' },
+            { ingredients: ['sulfur', 'charcoal'], result: 'gunpowder' },
+            { ingredients: ['iron_ore', 'fire'], result: 'furnace' }
+        ];
+
+        // STAGES DATABASE
+        const STAGES = [
+            {
+                id: '1-1',
+                code: 'STAGE 1-1',
+                chapter: 'CHAPTER 1: ERA BATU',
+                title: 'Awaken in the Wilderness',
+                desc: 'Kumpulkan serat kayu dan batu api untuk membuat api pertama peradaban.',
+                unlocked: true,
+                stars: 0,
+                isBattle: false,
+                story: {
+                    speaker: 'SENKU ISHIGAMI & TAIJU',
+                    text: '"3.700 tahun telah berlalu sejak seluruh umat manusia berubah menjadi batu. Penanggalan di batu batuan menunjukkan kita berada di tahun 5738 Masehi! Kita tidak boleh menyerah pada kegelapan zaman purba. 10 milyar persen kita akan merintis ulang peradaban modern dengan kekuatan sains murni!"'
+                },
+                nodes: [
+                    { itemId: 'wood_fiber', name: 'Pohon Kering', icon: '🪵' },
+                    { itemId: 'flint', name: 'Tebikan Batu', icon: '🪨' }
+                ],
+                targetItem: 'fire',
+                tasks: [
+                    { desc: 'Kumpulkan Serat Kayu & Batu Api', done: false },
+                    { desc: 'Racik Api Pertama di Lab Crafting', done: false }
+                ]
+            },
+            {
+                id: '1-2',
+                code: 'STAGE 1-2',
+                chapter: 'CHAPTER 1: ERA BATU',
+                title: 'Miracle Water Discovery',
+                desc: 'Temukan guano di gua untuk meracik Asam Nitrat murni pembuka pembekuan.',
+                unlocked: false,
+                stars: 0,
+                isBattle: false,
+                story: {
+                    speaker: 'SENKU ISHIGAMI',
+                    text: '"Hehehe... Cairan keajaiban (Miracle Water)! Dengan mencampurkan asam nitrat dari kotoran kelelawar gua dan alkohol anggur, kita bisa memecahkan cangkang batu petrifikasi. Taiju, bersiaplah! Kita akan membangkitkan kesadaran manusia pertama keluar dari batu purba!"'
+                },
+                nodes: [
+                    { itemId: 'guano', name: 'Gua Kelelawar', icon: '🦇' },
+                    { itemId: 'minerals', name: 'Sumber Air Gua', icon: '💧' }
+                ],
+                targetItem: 'nitric_acid',
+                tasks: [
+                    { desc: 'Kumpulkan Guano dan Air Mineral Gua', done: false },
+                    { desc: 'Racik Asam Nitrat Kebangkitan', done: false }
+                ]
+            },
+            {
+                id: '1-3',
+                code: 'STAGE 1-3 (BATTLE)',
+                chapter: 'CHAPTER 1: ERA BATU',
+                title: 'Wild Beast Attack!',
+                desc: 'Pertarungan pertama! Singa buas menyerang kemah saat membuat sabun.',
+                unlocked: false,
+                stars: 0,
+                isBattle: true,
+                story: {
+                    speaker: 'KOHAKU & TAIJU',
+                    text: '"Awas! Kawanan singa buas penguasa alam liar mengepung perkemahan kita! Tanpa pertahanan sains modern, kita akan menjadi santapan mereka. Taiju, gunakan perisai fisik, sementara aku dan Senku meracik formula pembersih sabun dan pelindung kimia!"'
+                },
+                enemy: { name: '🦁 Kawanan Singa Liar', hp: 120, maxHp: 120, attack: 15 },
+                nodes: [
+                    { itemId: 'seashells', name: 'Pesisir Kerang', icon: '🐚' },
+                    { itemId: 'ashes', name: 'Sisa Pembakaran', icon: '🧹' }
+                ],
+                targetItem: 'soap',
+                tasks: [
+                    { desc: 'Buat Sabun Pembersih di Lab', done: false },
+                    { desc: 'Kalahkan Kawanan Singa Buas', done: false }
+                ]
+            },
+            {
+                id: '2-1',
+                code: 'STAGE 2-1',
+                chapter: 'CHAPTER 2: VS TSUKASA EMPIRE',
+                title: 'The Weapon of Science (Bubuk Mesiu)',
+                desc: 'Cari belerang vulkanik dan arang untuk senjata penyeimbang kekuatan.',
+                unlocked: false,
+                stars: 0,
+                isBattle: false,
+                story: {
+                    speaker: 'SENKU ISHIGAMI',
+                    text: '"Tsukasa Shishio berniat menciptakan dunia tanpa teknologi modern demi ambisinya. Ideologinya berbahaya bagi masa depan peradaban! Kita harus melangkah lebih cepat. Belerang dari kawah vulkanik dan arang kayu akan menjadi bahan peledak bubuk mesiu penyeimbang kekuatan!"'
+                },
+                nodes: [
+                    { itemId: 'sulfur', name: 'Kawah Belerang', icon: '🟡' },
+                    { itemId: 'charcoal', name: 'Pembakaran Arang', icon: '⬛' }
+                ],
+                targetItem: 'gunpowder',
+                tasks: [
+                    { desc: 'Kumpulkan Belerang Sulfur & Arang', done: false },
+                    { desc: 'Racik Bubuk Mesiu (Black Powder)', done: false }
+                ]
+            },
+            {
+                id: '2-2',
+                code: 'STAGE 2-2 (BATTLE)',
+                chapter: 'CHAPTER 2: VS TSUKASA EMPIRE',
+                title: 'Clash with Tsukasa Vanguard',
+                desc: 'Gunakan bubuk mesiu hasil eksperimen untuk menahan gempuran Tsukasa!',
+                unlocked: false,
+                stars: 0,
+                isBattle: true,
+                story: {
+                    speaker: 'TSUKASA SHISHIO & SENKU',
+                    text: '"Senku... kekerasan dunia ini tidak akan bisa disembuhkan oleh sains bodohmu!" teriak Tsukasa. "Heh, jangan meremehkan hukum fisika dan kimia, Tsukasa!" balas Senku. Kobarkan ledakan sains dan hantam barisan pasukan terkuat di pertempuran puncak ini!'
+                },
+                enemy: { name: '💥 Tsukasa & Pasukan Fisik', hp: 250, maxHp: 250, attack: 25 },
+                nodes: [
+                    { itemId: 'iron_ore', name: 'Batu Bijih Besi', icon: '🧲' },
+                    { itemId: 'wood_fiber', name: 'Kayu Kuat', icon: '🪵' }
+                ],
+                targetItem: 'furnace',
+                tasks: [
+                    { desc: 'Kumpulkan Pasir Besi & Buat Peralatan Logam', done: false },
+                    { desc: 'Menangkan Pertarungan Melawan Pasukan Tsukasa', done: false }
+                ]
+            }
+        ];
+
+        // GAME STATE
+        let currentStageId = '1-1';
+        let inventory = {}; 
+        let selectedSlot1 = null;
+        let selectedSlot2 = null;
+        let unlockedEncyclopedia = new Set();
+        let playerHp = 100;
+        let enemyHp = 100;
+
+        // INITIALIZATION
+        window.onload = () => {
+            renderStages();
+            loadStage(currentStageId);
+        };
+
+        function renderStages() {
+            const list = document.getElementById('stage-list');
+            list.innerHTML = '';
+
+            STAGES.forEach(stage => {
+                const btn = document.createElement('button');
+                btn.onclick = () => {
+                    if (stage.unlocked) {
+                        loadStage(stage.id);
+                    } else {
+                        playSFX('fail');
+                    }
+                };
+                
+                const isActive = stage.id === currentStageId;
+                const isUnlocked = stage.unlocked;
+
+                let starIcons = '';
+                for (let i = 1; i <= 3; i++) {
+                    if (i <= stage.stars) {
+                        starIcons += '<i class="fa-solid fa-star text-yellow-400 text-xs"></i>';
+                    } else {
+                        starIcons += '<i class="fa-regular fa-star text-gray-600 text-xs"></i>';
+                    }
+                }
+
+                btn.className = `w-full text-left p-3 rounded-xl border transition flex flex-col gap-1 ${
+                    isActive 
+                        ? 'bg-emerald-950/80 border-emerald-500 shadow-md shadow-emerald-950/50' 
+                        : isUnlocked 
+                            ? 'bg-gray-900 border-gray-800 hover:border-gray-700' 
+                            : 'bg-gray-950/60 border-gray-900 opacity-50 cursor-not-allowed'
+                }`;
+
+                btn.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="text-[10px] font-bold ${isUnlocked ? 'text-emerald-400' : 'text-gray-600'}">${stage.code}</span>
+                        <div class="flex gap-1">${starIcons}</div>
+                    </div>
+                    <div class="text-sm font-bold ${isActive ? 'text-emerald-300' : isUnlocked ? 'text-gray-200' : 'text-gray-600'}">
+                        ${isUnlocked ? '' : '🔒 '}${stage.title}
+                    </div>
+                    <div class="text-[10px] text-gray-500">${stage.chapter}</div>
+                `;
+
+                list.appendChild(btn);
+            });
+        }
+
+        function loadStage(stageId) {
+            playSFX('click');
+            currentStageId = stageId;
+            const stage = STAGES.find(s => s.id === stageId);
+
+            document.getElementById('stage-code').innerText = stage.code;
+            document.getElementById('stage-title').innerText = stage.title;
+            document.getElementById('stage-desc').innerText = stage.desc;
+
+            // Render stage stars
+            for (let i = 1; i <= 3; i++) {
+                const star = document.getElementById(`star-${i}`);
+                if (i <= stage.stars) {
+                    star.className = "fa-solid fa-star text-yellow-400 text-lg";
+                } else {
+                    star.className = "fa-solid fa-star text-gray-600 text-lg";
+                }
+            }
+
+            // Render gathering nodes
+            const nodesContainer = document.getElementById('gathering-nodes');
+            nodesContainer.innerHTML = '';
+            stage.nodes.forEach(node => {
+                const nodeBtn = document.createElement('button');
+                nodeBtn.onclick = () => gatherItem(node.itemId);
+                nodeBtn.className = "bg-gray-900 hover:bg-gray-850 border border-emerald-500/30 hover:border-emerald-500 p-3.5 rounded-xl text-left transition flex items-center gap-3 group active:scale-95 shadow-md";
+                nodeBtn.innerHTML = `
+                    <span class="text-3xl group-hover:scale-110 transition-transform">${node.icon}</span>
+                    <div>
+                        <div class="text-xs font-bold text-emerald-400">${node.name}</div>
+                        <div class="text-[10px] text-gray-400">Klik untuk Kumpul</div>
+                    </div>
+                `;
+                nodesContainer.appendChild(nodeBtn);
+            });
+
+            // Handle Battle View Mode
+            const battleView = document.getElementById('battle-view');
+            if (stage.isBattle) {
+                battleView.classList.remove('hidden');
+                playerHp = 100;
+                enemyHp = stage.enemy.hp;
+                document.getElementById('enemy-name').innerText = stage.enemy.name;
+                document.getElementById('enemy-hp-text').innerText = `${enemyHp} / ${stage.enemy.maxHp} HP`;
+                document.getElementById('enemy-hp-bar').style.width = '100%';
+                document.getElementById('player-hp-bar').style.width = '100%';
+                document.getElementById('player-hp-text').innerText = '100 / 100 HP';
+                document.getElementById('battle-log').innerHTML = `<p class="text-amber-400">⚡ Pertarungan dimulai! Racik penemuan sains di Lab atau gunakan aksi taktis untuk mengalahkan ${stage.enemy.name}.</p>`;
+            } else {
+                battleView.classList.add('hidden');
+            }
+
+            // Clear slots and update UI
+            clearSlot(1);
+            clearSlot(2);
+            hideResult();
+            renderStages();
+            renderInventory();
+            updateTasks();
+            showStoryModal();
+        }
+
+        function showStoryModal() {
+            const stage = STAGES.find(s => s.id === currentStageId);
+            document.getElementById('story-chapter-title').innerText = `ALUR CERITA - ${stage.chapter}`;
+            document.getElementById('story-speaker-name').innerText = stage.story.speaker;
+            document.getElementById('story-dialogue-text').innerText = stage.story.text;
+            toggleModal('story-modal');
+        }
+
+        function toggleModal(modalId) {
+            playSFX('click');
+            const modal = document.getElementById(modalId);
+            modal.classList.toggle('hidden');
+        }
+
+        function gatherItem(itemId) {
+            playSFX('gather');
+            inventory[itemId] = (inventory[itemId] || 0) + 1;
+            renderInventory();
+            checkTaskGathering();
+        }
+
+        function selectItemForCrafting(itemId) {
+            playSFX('click');
+            if (!selectedSlot1) {
+                selectedSlot1 = itemId;
+                renderSlot(1, itemId);
+            } else if (!selectedSlot2) {
+                selectedSlot2 = itemId;
+                renderSlot(2, itemId);
+            }
+        }
+
+        function renderSlot(slotNum, itemId) {
+            const slot = document.getElementById(`slot-${slotNum}`);
+            const item = ITEMS[itemId];
+            slot.innerHTML = `
+                <span class="text-2xl">${item.icon}</span>
+                <span class="text-[10px] text-cyan-300 mt-1 font-bold truncate max-w-full px-1">${item.name}</span>
+            `;
+            slot.classList.add('border-cyan-400', 'bg-cyan-950/40');
+        }
+
+        function clearSlot(slotNum) {
+            playSFX('click');
+            if (slotNum === 1) selectedSlot1 = null;
+            if (slotNum === 2) selectedSlot2 = null;
+
+            const slot = document.getElementById(`slot-${slotNum}`);
+            slot.innerHTML = `<span class="text-xs text-gray-500 font-bold">Bahan ${slotNum}</span>`;
+            slot.classList.remove('border-cyan-400', 'bg-cyan-950/40');
+        }
+
+        function combineIngredients() {
+            if (!selectedSlot1 || !selectedSlot2) {
+                showResult('⚠️ Pilih 2 bahan terlebih dahulu!', 'bg-yellow-950 border border-yellow-700 text-yellow-300');
+                playSFX('fail');
+                return;
+            }
+
+            // TRIGGER LAB ANIMATION OVERLAY & AUDIO SYNTH
+            const fxOverlay = document.getElementById('science-fx-overlay');
+            fxOverlay.classList.remove('hidden');
+            playSFX('reaction');
+
+            setTimeout(() => {
+                fxOverlay.classList.add('hidden');
+
+                const foundRecipe = RECIPES.find(r => 
+                    (r.ingredients[0] === selectedSlot1 && r.ingredients[1] === selectedSlot2) ||
+                    (r.ingredients[0] === selectedSlot2 && r.ingredients[1] === selectedSlot1)
+                );
+
+                if (foundRecipe) {
+                    const resultItem = ITEMS[foundRecipe.result];
+                    inventory[foundRecipe.result] = (inventory[foundRecipe.result] || 0) + 1;
+                    
+                    // Consume ingredients
+                    inventory[selectedSlot1]--;
+                    inventory[selectedSlot2]--;
+                    if (inventory[selectedSlot1] <= 0) delete inventory[selectedSlot1];
+                    if (inventory[selectedSlot2] <= 0) delete inventory[selectedSlot2];
+
+                    unlockedEncyclopedia.add(foundRecipe.result);
+                    updateEncyclopedia();
+
+                    showResult(`🧪 EKSPERIMEN BERHASIL! Membuat ${resultItem.name} ${resultItem.icon}`, 'bg-emerald-950 border border-emerald-600 text-emerald-300');
+                    playSFX('success');
+
+                    checkStageCompletion(foundRecipe.result);
+                } else {
+                    showResult('💥 REAKSI GAGAL! Kombinasi elemen tidak menghasilkan reaksi apapun.', 'bg-red-950 border border-red-700 text-red-300');
+                    playSFX('fail');
+                }
+
+                clearSlot(1);
+                clearSlot(2);
+                renderInventory();
+            }, 800);
+        }
+
+        function showResult(text, styleClasses) {
+            const res = document.getElementById('lab-result');
+            res.className = `p-3 rounded-lg text-xs text-center font-bold mb-4 ${styleClasses}`;
+            res.innerText = text;
+            res.classList.remove('hidden');
+        }
+
+        function hideResult() {
+            document.getElementById('lab-result').classList.add('hidden');
+        }
+
+        function renderInventory() {
+            const grid = document.getElementById('inventory-grid');
+            grid.innerHTML = '';
+
+            const keys = Object.keys(inventory);
+            if (keys.length === 0) {
+                grid.innerHTML = `<div class="col-span-4 text-center text-xs text-gray-600 py-6">Inventaris Kosong. Kumpulkan bahan di sebelah kiri.</div>`;
+                return;
+            }
+
+            keys.forEach(id => {
+                const count = inventory[id];
+                if (count <= 0) return;
+                const item = ITEMS[id];
+
+                const card = document.createElement('button');
+                card.onclick = () => selectItemForCrafting(id);
+                card.className = "bg-gray-900 hover:bg-gray-800 border border-gray-800 hover:border-cyan-500/50 p-2 rounded-xl flex flex-col items-center justify-center relative transition group active:scale-95";
+                card.innerHTML = `
+                    <span class="text-xl group-hover:scale-110 transition-transform">${item.icon}</span>
+                    <span class="text-[10px] text-gray-300 font-bold truncate max-w-full mt-1">${item.name}</span>
+                    <span class="absolute top-1 right-1 text-[9px] bg-emerald-950 border border-emerald-800 text-emerald-400 font-bold px-1.5 rounded-full">${count}</span>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function updateTasks() {
+            const stage = STAGES.find(s => s.id === currentStageId);
+            const container = document.getElementById('stage-tasks');
+            container.innerHTML = '';
+
+            stage.tasks.forEach(task => {
+                const div = document.createElement('div');
+                div.className = "flex items-center gap-2 text-xs";
+                div.innerHTML = `
+                    <i class="fa-solid ${task.done ? 'fa-circle-check text-emerald-400' : 'fa-circle text-gray-700'}"></i>
+                    <span class="${task.done ? 'line-through text-gray-500' : 'text-gray-300'}">${task.desc}</span>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function checkTaskGathering() {
+            const stage = STAGES.find(s => s.id === currentStageId);
+            let hasGathered = true;
+            stage.nodes.forEach(n => {
+                if (!inventory[n.itemId]) hasGathered = false;
+            });
+
+            if (hasGathered) {
+                stage.tasks[0].done = true;
+                updateTasks();
+            }
+        }
+
+        function checkStageCompletion(craftedResultId) {
+            const stage = STAGES.find(s => s.id === currentStageId);
+
+            if (craftedResultId === stage.targetItem) {
+                stage.tasks[1].done = true;
+                if (!stage.isBattle) {
+                    stage.stars = 3;
+                    unlockNextStage();
+                } else {
+                    stage.tasks[0].done = true;
+                    // If crafted in battle mode, deal heavy science damage
+                    dealBattleDamage(80, "🧪 REAKSI SAINS MAHADAHSHYAT MENINGKATKAN KEKUATAN TEMPUR!");
+                }
+                updateTasks();
+                renderStages();
+            }
+        }
+
+        function executeBattleAction(actionType) {
+            const stage = STAGES.find(s => s.id === currentStageId);
+            if (!stage || !stage.isBattle) return;
+
+            const log = document.getElementById('battle-log');
+
+            if (actionType === 'attack_science') {
+                if (inventory[stage.targetItem]) {
+                    dealBattleDamage(60, `💥 Menggunakan ${ITEMS[stage.targetItem].name}! Ledakan sains melumpuhkan pertahanan musuh!`);
+                    inventory[stage.targetItem]--;
+                    if (inventory[stage.targetItem] <= 0) delete inventory[stage.targetItem];
+                    renderInventory();
+                } else {
+                    dealBattleDamage(20, `🧪 Serangan Reaksi Kimia Sederhana menghasilkan 20 Damage! (Racik ${ITEMS[stage.targetItem].name} di Lab untuk Damage Besar)`);
+                }
+            } else if (actionType === 'defend_taiju') {
+                playSFX('click');
+                const heal = 25;
+                playerHp = Math.min(100, playerHp + heal);
+                document.getElementById('player-hp-bar').style.width = `${playerHp}%`;
+                document.getElementById('player-hp-text').innerText = `${playerHp} / 100 HP`;
+                log.innerHTML += `<p class="text-yellow-400">🛡️ Pertahanan Perisai Logam menahan serangan & memulihkan ${heal} HP!</p>`;
+                enemyRetaliate(10);
+            } else if (actionType === 'scout_kohaku') {
+                dealBattleDamage(30, `⚡ Serangan Cepat Kilat memberikan 30 Damage langsung!`);
+            }
+        }
+
+        function dealBattleDamage(dmg, logText) {
+            playSFX('hit');
+            const stage = STAGES.find(s => s.id === currentStageId);
+            enemyHp = Math.max(0, enemyHp - dmg);
+            
+            const pct = Math.max(0, (enemyHp / stage.enemy.maxHp) * 100);
+            document.getElementById('enemy-hp-bar').style.width = `${pct}%`;
+            document.getElementById('enemy-hp-text').innerText = `${enemyHp} / ${stage.enemy.maxHp} HP`;
+
+            const log = document.getElementById('battle-log');
+            log.innerHTML += `<p class="text-cyan-300">${logText}</p>`;
+            log.scrollTop = log.scrollHeight;
+
+            if (enemyHp <= 0) {
+                playSFX('success');
+                log.innerHTML += `<p class="text-emerald-400 font-bold">🎉 MUSUH BERHASIL DILUMPUHKAN! KERASAAN SAINS MENANG!</p>`;
+                stage.stars = 3;
+                stage.tasks[1].done = true;
+                updateTasks();
+                unlockNextStage();
+            } else {
+                enemyRetaliate(stage.enemy.attack);
+            }
+        }
+
+        function enemyRetaliate(atkDmg) {
+            setTimeout(() => {
+                playerHp = Math.max(0, playerHp - atkDmg);
+                document.getElementById('player-hp-bar').style.width = `${playerHp}%`;
+                document.getElementById('player-hp-text').innerText = `${playerHp} / 100 HP`;
+
+                const log = document.getElementById('battle-log');
+                log.innerHTML += `<p class="text-red-400">⚠️ Musuh menyerang balik! Kerajaan Sains menerima ${atkDmg} Damage.</p>`;
+                log.scrollTop = log.scrollHeight;
+
+                if (playerHp <= 0) {
+                    playSFX('fail');
+                    log.innerHTML += `<p class="text-red-600 font-bold">❌ KERAJAAN SAINS KALAH! Coba lagi eksperimen dari awal stage.</p>`;
+                }
+            }, 400);
+        }
+
+        function unlockNextStage() {
+            const currIdx = STAGES.findIndex(s => s.id === currentStageId);
+            if (currIdx < STAGES.length - 1) {
+                STAGES[currIdx + 1].unlocked = true;
+                renderStages();
+            }
+            updateGlobalStars();
+        }
+
+        function updateGlobalStars() {
+            const total = STAGES.reduce((acc, s) => acc + s.stars, 0);
+            document.getElementById('total-stars').innerText = total;
+            document.getElementById('science-lvl').innerText = `Lv.${Math.floor(total / 3) + 1}`;
+        }
+
+        function updateEncyclopedia() {
+            const list = document.getElementById('encyclopedia-list');
+            list.innerHTML = '';
+
+            if (unlockedEncyclopedia.size === 0) {
+                list.innerHTML = `<p class="text-xs text-gray-500">Belum ada penemuan sains yang tercatat dalam ensiklopedia.</p>`;
+                return;
+            }
+
+            unlockedEncyclopedia.forEach(id => {
+                const item = ITEMS[id];
+                const card = document.createElement('div');
+                card.className = "bg-gray-950 border border-emerald-500/30 p-4 rounded-xl flex items-start gap-4";
+                card.innerHTML = `
+                    <div class="text-4xl bg-gray-900 p-2 rounded-lg border border-gray-800">${item.icon}</div>
+                    <div>
+                        <h4 class="text-sm font-bold text-emerald-400 font-tech text-lg">${item.name}</h4>
+                        <p class="text-xs text-gray-300 mt-1">${item.desc}</p>
+                        <span class="text-[10px] text-cyan-400 mt-2 block font-bold">✓ Terdaftar dalam catatan resep Senku</span>
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+        }
+    </script>
+</body>
+</html>
